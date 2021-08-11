@@ -8,33 +8,17 @@ namespace UpsertSampleWebApplication.Command
 {
     public abstract record TodoCommand : IRequest<int>;
 
-    public record InsertTodoCommand(string Name) : TodoCommand;
-
-    public record UpdateTodoCommand(Guid Id, string Name) : InsertTodoCommand(Name);
-
-    public class InsertTodoCommandHandler : IRequestHandler<InsertTodoCommand, int>
+    public class TodoCommandHandler<T> : IRequestHandler<T, int>
+        where T : TodoCommand
     {
         private readonly ITodoService _todoService;
 
-        public InsertTodoCommandHandler(ITodoService todoService)
+        protected TodoCommandHandler(ITodoService todoService)
         {
             _todoService = todoService ?? throw new ArgumentNullException(nameof(todoService));
         }
         
-        public Task<int> Handle(InsertTodoCommand request, CancellationToken cancellationToken) => 
-            _todoService.UpsertAsync(request, cancellationToken);
-    }
-    
-    public class UpdateTodoCommandHandler : IRequestHandler<UpdateTodoCommand, int>
-    {
-        private readonly ITodoService _todoService;
-
-        public UpdateTodoCommandHandler(ITodoService todoService)
-        {
-            _todoService = todoService ?? throw new ArgumentNullException(nameof(todoService));
-        }
-        
-        public Task<int> Handle(UpdateTodoCommand request, CancellationToken cancellationToken) => 
+        public Task<int> Handle(T request, CancellationToken cancellationToken) => 
             _todoService.UpsertAsync(request, cancellationToken);
     }
 }
